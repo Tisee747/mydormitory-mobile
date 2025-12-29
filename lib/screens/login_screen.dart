@@ -28,14 +28,36 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    final user = await ApiService.login(email, password);
+    try {
+      final user = await ApiService.login(email, password).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          throw Exception(
+            "Koneksi Timeout! Server tidak merespon dalam 5 detik.",
+          );
+        },
+      );
 
-    setState(() {
-      _loading = false;
-      _message = (user != null)
-          ? 'Login berhasil! Selamat datang, ${user.name}'
-          : 'Email atau password salah.';
-    });
+      if (mounted) {
+        setState(() {
+          _loading = false; // Matikan loading
+          if (user != null) {
+            _message = 'Login berhasil! Selamat datang, ${user.name}';
+          } else {
+            _message = 'Email atau password salah.';
+          }
+        });
+      }
+    } catch (e) {
+      print("ERROR LOGIN: $e"); // Cek terminal
+
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _message = 'Gagal terhubung: $e';
+        });
+      }
+    }
   }
 
   @override
@@ -50,7 +72,11 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  const Icon(Icons.account_circle, size: 100, color: Colors.indigo),
+                  const Icon(
+                    Icons.account_circle,
+                    size: 100,
+                    color: Colors.indigo,
+                  ),
                   const SizedBox(height: 20),
                   const Text(
                     'Login Penghuni Asrama',
