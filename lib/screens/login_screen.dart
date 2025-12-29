@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/user.dart';
+import 'package:mydormitory/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,7 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _loading = false; // Matikan loading
           if (user != null) {
-            _message = 'Login berhasil! Selamat datang, ${user.name}';
+            _message = 'Login berhasil! Mengalihkan...';
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
+            }
           } else {
             _message = 'Email atau password salah.';
           }
