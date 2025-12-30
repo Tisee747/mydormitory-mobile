@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'services/api_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,81 +9,65 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  bool isLoading = false;
-  String message = '';
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool loading = false;
 
   Future<void> login() async {
-    setState(() {
-      isLoading = true;
-      message = '';
-    });
+    setState(() => loading = true);
 
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': emailController.text,
-        'password': passwordController.text,
-      }),
+    final user = await ApiService.login(
+      emailController.text.trim(),
+      passwordController.text,
     );
 
-    final data = jsonDecode(response.body);
+    setState(() => loading = false);
 
-    setState(() {
-      isLoading = false;
-      if (data['success'] == true) {
-        message = 'Login berhasil! Selamat datang ${data['user']['name']}';
-      } else {
-        message = 'Login gagal. Email atau password salah.';
-      }
-    });
+    if (!mounted) return;
+
+    if (user != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login berhasil')));
+      // TODO: navigate ke home
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login gagal')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Text(
-                  'MyDormitory Login',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 40),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: login,
-                        child: const Text('Login'),
-                      ),
-                const SizedBox(height: 16),
-                Text(message, style: const TextStyle(color: Colors.red)),
-              ],
-            ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 24),
+              const Text(
+                'Login',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: loading ? null : login,
+                child: Text(loading ? 'Loading...' : 'Login'),
+              ),
+            ],
           ),
         ),
       ),
