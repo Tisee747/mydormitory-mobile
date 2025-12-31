@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../models/user.dart';
 import 'package:mydormitory/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,34 +28,43 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
+    debugPrint("=== DEBUG DATA LOGIN ===");
+    debugPrint("Email dikirim: '$email'"); // Perhatikan tanda kutipnya
+    debugPrint(
+      "Password dikirim: '$password'",
+    ); // Apakah ada spasi di dalam kutip?
+    debugPrint("========================");
+
     try {
-      final user = await ApiService.login(email, password).timeout(
-        const Duration(seconds: 5),
+      final response = await ApiService.login(email, password).timeout(
+        const Duration(seconds: 15),
         onTimeout: () {
           throw Exception(
-            "Koneksi Timeout! Server tidak merespon dalam 5 detik.",
+            "Koneksi Timeout! Server tidak merespon dalam 15 detik.",
           );
         },
       );
 
       if (mounted) {
         setState(() {
-          _loading = false; // Matikan loading
-          if (user != null) {
-            _message = 'Login berhasil! Mengalihkan...';
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-              );
-            }
+          _loading = false;
+
+          if (response.success && response.user != null) {
+            _message = 'Login berhasil!';
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(user: response.user!),
+              ),
+            );
           } else {
-            _message = 'Email atau password salah.';
+            _message = response.message ?? 'Login gagal';
           }
         });
       }
     } catch (e) {
-      print("ERROR LOGIN: $e"); // Cek terminal
+      debugPrint("ERROR LOGIN: $e"); // Cek terminal
 
       if (mounted) {
         setState(() {
