@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, left: 24, right: 24),
             decoration: const BoxDecoration(
-              color: Color(0xFF2962FF), // Warna Biru Utama (Indigo Accent)
+              color: Color(0xFFB01015), // Primary merah sesuai CSS
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(32),
                 bottomRight: Radius.circular(32),
@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     boxShadow: [
                       BoxShadow(
                         color: const Color(
-                          0xFF2962FF,
+                          0xFFB01015,
                         ).withAlpha((0.15 * 255).round()),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? null
                               : _handleScanQR, // Disable jika sudah absen
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2962FF),
+                            backgroundColor: const Color(0xFFB01015),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

@@ -78,63 +78,115 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8F9FA),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.account_circle,
-                    size: 100,
-                    color: Colors.indigo,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Login Penghuni Asrama',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (v) => v!.isEmpty ? 'Masukkan email' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (v) => v!.isEmpty ? 'Masukkan password' : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  ElevatedButton(
-                    onPressed: _loading ? null : _doLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo,
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: _loading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Login', style: TextStyle(fontSize: 18)),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(_message, style: const TextStyle(color: Colors.red)),
-                ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Logo circle
+              CircleAvatar(
+                radius: 44,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: const Icon(
+                  Icons.home_outlined,
+                  size: 40,
+                  color: Colors.white,
+                ),
               ),
-            ),
+              const SizedBox(height: 18),
+              const Text(
+                'Login Penghuni Asrama',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+
+              // Card with form
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 520),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha((0.06 * 255).round()),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Gunakan Akun SSO untuk Login',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'youremail@dorm.edu',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) => v!.isEmpty ? 'Masukkan email' : null,
+                      ),
+                      const SizedBox(height: 12),
+
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Masukkan password',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) =>
+                            v!.isEmpty ? 'Masukkan password' : null,
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _loading ? null : _doLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _loading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  'Login',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_message.isNotEmpty)
+                        Text(
+                          _message,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
