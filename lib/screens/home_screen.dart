@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart'; // Pastikan path ini sesuai dengan struktur foldermu
+import '../models/penghuni.dart';
+import '../services/api_service.dart';
+import 'attendance_history_screen.dart';
+import 'report_issue_screen.dart';
+import 'notifications_screen.dart';
+import 'scan_qr_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final User user; // Data user yang dibawa dari Login
+  final User user;
+  final Penghuni penghuni;
 
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({super.key, required this.user, required this.penghuni});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,32 +29,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkAttendanceStatus();
   }
 
-  // Fungsi simulasi READ data ke Backend
   Future<void> _checkAttendanceStatus() async {
     setState(() => _isLoading = true);
-
-    // Nanti disini kita panggil: await ApiService.checkAttendance(widget.user.id);
-    // Untuk sekarang kita simulasi delay jaringan saja:
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Anggap database menjawab: "Belum absen"
-    if (mounted) {
-      setState(() {
-        _hasAttended = false;
-        _isLoading = false;
-      });
-    }
+    final attended = await ApiService.hasPresensiToday(widget.penghuni.id);
+    if (!mounted) return;
+    setState(() {
+      _hasAttended = attended;
+      _isLoading = false;
+    });
   }
 
-  // Fungsi simulasi CREATE data (Scan QR)
-  void _handleScanQR() {
-    debugPrint(
-      "Membuka Scanner untuk User: ${widget.user.name} (ID: ${widget.user.id})",
+  Future<void> _handleScanQR() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ScanQrScreen(penghuni: widget.penghuni),
+      ),
     );
-    // Logika:
-    // 1. Buka Kamera -> scan QR
-    // 2. Dapat String QR -> Kirim ke API (Create Attendance)
-    // 3. Jika sukses -> ubah setState _hasAttended = true
+
+    if (result == true) {
+      setState(() => _hasAttended = true);
+    }
   }
 
   @override
@@ -269,7 +271,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "Attendance History",
                         subtitle: "View your past records",
                         onTap: () {
-                          // Navigasi ke halaman History
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AttendanceHistoryScreen(
+                                penghuni: widget.penghuni,
+                              ),
+                            ),
+                          );
                         },
                       ),
                       _buildMenuItem(
@@ -277,14 +286,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.orange,
                         title: "Report Issue",
                         subtitle: "Correct your attendance",
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ReportIssueScreen(penghuni: widget.penghuni),
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuItem(
                         icon: Icons.notifications_active_rounded,
                         color: Colors.purple,
                         title: "Notifications",
                         subtitle: "Announcements from dorm",
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  NotificationsScreen(user: widget.user),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

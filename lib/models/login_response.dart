@@ -1,10 +1,11 @@
 import 'user.dart';
+import 'penghuni.dart';
 
 class LoginResponse {
   final bool success;
   final String? role;
   final User? user;
-  final Map<String, dynamic>? penghuni;
+  final Penghuni? penghuni;
   final String? message;
 
   LoginResponse({
@@ -18,10 +19,12 @@ class LoginResponse {
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       success: json['success'] ?? false,
-      role: json['role'],
+      role: json['role']?.toString(),
       user: json['user'] != null ? User.fromJson(json['user']) : null,
-      penghuni: json['penghuni'],
-      message: json['message'],
+      penghuni: json['penghuni'] != null
+          ? Penghuni.fromJson(json['penghuni'])
+          : null,
+      message: json['message']?.toString(),
     );
   }
 }

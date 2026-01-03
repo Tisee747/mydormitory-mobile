@@ -50,12 +50,18 @@ class _LoginScreenState extends State<LoginScreen> {
           _loading = false;
 
           if (response.success && response.user != null) {
-            _message = 'Login berhasil!';
+            if (response.role != 'penghuni' || response.penghuni == null) {
+              _message = 'Akun ini bukan penghuni (khusus mobile penghuni).';
+              return;
+            }
 
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(user: response.user!),
+                builder: (context) => HomeScreen(
+                  user: response.user!,
+                  penghuni: response.penghuni!,
+                ),
               ),
             );
           } else {
